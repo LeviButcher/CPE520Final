@@ -21,8 +21,9 @@
 [x] Only Load data once 
 [x] Use Validation set to explore best threshold value
 [x] Start HW13
+[x] Change cm to be percentage based
 [] Summarize buy/sell orders that happen in the same second
-[] Change cm to be percentage based
+
 
 
 Later On:

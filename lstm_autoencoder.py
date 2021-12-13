@@ -3,7 +3,7 @@ from torch import nn
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import ConfusionMatrixDisplay, precision_score, recall_score, f1_score
+from sklearn.metrics import ConfusionMatrixDisplay
 from pump_and_dump_dataset import PumpAndDumpDataset
 from torch.utils.data import DataLoader
 
@@ -89,7 +89,7 @@ def compute_metrics(cm):
     tp = cm[1][1]
     total = tn + fp + fn + tp
 
-    accuracy = tn + tp / total * 100
+    accuracy = (tn + tp) / total * 100
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
     f1 = 2 * precision * recall / (precision + recall)
@@ -103,10 +103,11 @@ def find_best_threshold(val_dataloader, loss_fn, model):
     bestThreshold = 0
 
     with torch.no_grad():
+
         for t in thresholds:
-            for m in range(0, 100, 2):
-                t = t + t * m
-                pred, Y = zip(*[(predictPumpAndDump(X, model, loss_fn, t), Y.int().numpy())
+            for m in np.arange(0, 100, 1):
+                tm = t * sqrt(m)
+                pred, Y = zip(*[(predictPumpAndDump(X, model, loss_fn, tm), Y.int().numpy())
                                 for (X, Y) in val_dataloader])
                 pred = np.concatenate(pred)
                 Y = np.concatenate(Y)
@@ -114,20 +115,8 @@ def find_best_threshold(val_dataloader, loss_fn, model):
                 _, _, _, _, f1 = compute_metrics(cm)
 
                 if highestScore < f1:
-                    bestThreshold = t
+                    bestThreshold = tm
                     highestScore = f1
-
-            # t = bestThreshold * m
-
-            # pred, Y = zip(*[(predictPumpAndDump(X, model, loss_fn, t), Y.int().numpy())
-            #                 for (X, Y) in val_dataloader])
-            # pred = np.concatenate(pred)
-            # Y = np.concatenate(Y)
-            # cm = get_confusion_matrix(pred, Y)
-            # _, _, _, _, f1 = compute_metrics(cm)
-
-            # if highestScore < f1:
-            #     bestThreshold = t
 
     return bestThreshold
 
@@ -163,6 +152,7 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
         model.parameters(), lr=learning_rate, momentum=momentum)
 
     # Run Training
+    print(f"Running for window size of: {split_size} ---")
     lossList = []
     for i in range(epochs):
         print(f"Epoch: {i}")
@@ -171,6 +161,7 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
 
     # Plot Loss Curve
     plt.title("Training Loss")
+    plt.rcParams.update({'font.size': 16})
     plt.plot(range(epochs), lossList)
     plt.savefig(f"images/training_loss_lstm_encoder-{split_size}.png")
     plt.close()
@@ -189,15 +180,10 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
 
     cmp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix)
     fig, ax = plt.subplots(figsize=(10, 10))
-    cmp.plot(ax=ax, values_format=".5g")
+    plt.rcParams.update({'font.size': 20})
+    cmp.plot(ax=ax, values_format="g")
     fig.savefig(f"images/lstm_encoder-{split_size}-confusion_matrix")
     plt.close()
-
-    # accuracy = tn + tp / len(Y) * 100
-    # precision = tp / (tp + fp)
-    # recall = tp / (tp + fn)
-    # f1 = 2 * precision * recall / (precision + recall)
-    # truePercentage = (Y >= 1).sum() / len(Y) * 100
 
     truePercentage, accuracy, precision, recall, f1 = compute_metrics(
         confusion_matrix)
@@ -207,7 +193,7 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
 # Config / Model Setup
 split_sizes = [60, 25, 15, 5]  # Measured in seconds
 hidden_size = 1
-epochs = 5
+epochs = 10
 learning_rate = 1e-2
 momentum = .9
 batch_size = 100

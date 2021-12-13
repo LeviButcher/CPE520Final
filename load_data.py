@@ -68,7 +68,7 @@ def split_csv_data(pump_info, pump_data, split_size):
 
 
 cached_data = []
-dataset_size = 150
+dataset_size = 200
 
 
 def get_dataset(split_size):

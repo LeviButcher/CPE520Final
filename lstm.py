@@ -52,7 +52,7 @@ def rnn_train_step(dataloader, model, loss_fn, optimizer):
     return totalLoss / totalBatches
 
 
-def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum):
+def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum, batch_size):
     # Load Data
     dataset = PumpAndDumpDataset(split_size)
     n = len(dataset)
@@ -60,8 +60,9 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
     testSize = ceil(n - trainSize)
     trainSet, testSet = torch.utils.data.random_split(
         dataset, [trainSize, testSize], generator=torch.Generator().manual_seed(42))
-    train_dataloader = DataLoader(trainSet, batch_size=500, shuffle=True)
-    test_dataloader = DataLoader(testSet, batch_size=500, shuffle=True)
+    train_dataloader = DataLoader(
+        trainSet, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(testSet, batch_size=batch_size, shuffle=True)
 
     _, time_series_size, features = dataset.X.shape
     LSTM_Layers = 1
@@ -81,6 +82,7 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
 
     # Plot Loss Curve
     plt.title("Training Loss")
+    plt.rcParams.update({'font.size': 16})
     plt.plot(range(epochs), lossList)
     plt.savefig(f"images/training_loss_lstm-{split_size}.png")
     plt.close()
@@ -101,7 +103,8 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
 
     cmp = ConfusionMatrixDisplay(confusion_matrix=confusion_matrix)
     fig, ax = plt.subplots(figsize=(10, 10))
-    # cmp.plot(ax=ax, values_format=".5g")
+    plt.rcParams.update({'font.size': 20})
+    cmp.plot(ax=ax, values_format=".5g")
     fig.savefig(f"images/lstm-{split_size}-confusion_matrix")
     plt.close()
 
@@ -119,12 +122,13 @@ def evaluate_split_size(split_size, hidden_size, epochs, learning_rate, momentum
 # Config / Model Setup
 split_sizes = [5, 15, 25, 60]  # Measured in seconds
 hidden_size = 1
-epochs = 5
-learning_rate = 1e-4
+epochs = 10
+learning_rate = 1e-2
 momentum = .9
+batch_size = 100
 
 res = [evaluate_split_size(s, hidden_size,
-                           epochs, learning_rate, momentum) for s in split_sizes]
+                           epochs, learning_rate, momentum, batch_size) for s in split_sizes]
 res_matrix = np.vstack(res)
 np.savetxt("lstm_results.csv", res_matrix, delimiter=",")
 
