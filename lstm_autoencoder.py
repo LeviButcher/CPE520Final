@@ -98,7 +98,7 @@ def compute_metrics(cm):
 
 
 def find_best_threshold(val_dataloader, loss_fn, model):
-    thresholds = [0.001, 0.0001]
+    thresholds = [0.0001, 0.00001]
     highestScore = 0
     bestThreshold = 0
 
@@ -117,6 +117,8 @@ def find_best_threshold(val_dataloader, loss_fn, model):
                 if highestScore < f1:
                     bestThreshold = tm
                     highestScore = f1
+
+    print(f"BEST - f1:{highestScore}, thesh:{bestThreshold}")
 
     return bestThreshold
 

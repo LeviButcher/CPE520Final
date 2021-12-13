@@ -18,8 +18,6 @@ def get_data():
     files = get_file_paths(data_dir)
     filePaths = [join(data_dir, f) for f in files]
     data = [pd.read_csv(f) for f in filePaths]
-
-    print(data)
     return data
 
 
@@ -46,7 +44,8 @@ def load_csv_data(pump_info):
     filePath = join(data_dir, f"{p.symbol}_{p.date} {time}.csv")
     pump_data = pd.read_csv(filePath, parse_dates=["datetime"])
 
-    return pump_data
+    return pump_data.groupby(
+        [pump_data.datetime, pump_data.side], sort=False).agg({'price': ['mean'], 'amount': ['sum']}).reset_index()
 
 
 def split_csv_data(pump_info, pump_data, split_size):

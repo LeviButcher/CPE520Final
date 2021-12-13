@@ -14,7 +14,7 @@ class PumpAndDumpDataset(Dataset):
         self.transform = transform
         self.window_size = window_size
         X, Y = get_dataset(window_size)
-        X = X[:, :, 3:]
+        X = X[:, :, 1:]
         X[:, :, 0] = np.vectorize(
             lambda x: 0 if x == "sell" else 1)(X[:, :, 0])
         # Xnorm = np.linalg.norm(X)
