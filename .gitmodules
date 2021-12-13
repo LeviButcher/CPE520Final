@@ -1,0 +1,3 @@
+[submodule "pump-and-dump-dataset"]
+	path = pump-and-dump-dataset
+	url = https://github.com/SystemsLab-Sapienza/pump-and-dump-dataset

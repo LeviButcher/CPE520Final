@@ -1,0 +1,37 @@
+[x] Write Code to load data
+[x] Write LSTM Code
+[x] Compute Precision, Recall, F1
+[x] Run LSTM over several timeseries sizes
+[x] Save results of all sizes to csv file
+[x] Generate Confusion Matrix
+[x] Check that confusion matrix is correct
+[x] Separate into train / test set
+[x] Replace loading with dataloader and batch gradient
+[x] Add in normalization to dataset
+[x] Change to momentum learning rate
+[x] Encode Buy/Sell to 0 or 1
+[x] Download all data from Binance
+[x] Generate Results of all data
+[x] Write Results Slides
+[x] Write LSTMAutoencoder
+[x] Finish HW12
+[x] Add new LSTM results to slides
+[x] Add and understand LSTM
+[x] Practice presentation
+[x] Only Load data once 
+[x] Use Validation set to explore best threshold value
+[x] Start HW13
+[] Summarize buy/sell orders that happen in the same second
+[] Change cm to be percentage based
+
+
+Later On:
+[] Write Final Report
+
+Extra:
+[] May want to increase Confusion Matrix txt size
+[] Change to 5-Fold Validation
+[] Last minute: Plug in a Neural Network anomaly detection method (DeepSVD)
+
+
+watchexec -r -e py  -- python3 load_data.py
